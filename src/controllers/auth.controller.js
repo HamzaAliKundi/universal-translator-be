@@ -207,13 +207,19 @@ const getUser = async (req, res) => {
 const checkHasPaid = async (req, res) => {
   const user = req?.user;
   const free = 3;
+  const extraPerPayment = 20;
+
   try {
     const payments = await Payment.find({ userId: user?._id });
     const paidPayments = payments.filter(
       (payment) => payment.status === "succeeded"
     );
-    const hasPaid = free + paidPayments.length > user.numRequests;
-    const remainingRequests = free + paidPayments.length - user.numRequests;
+
+    const totalAllowedRequests = free + paidPayments.length * extraPerPayment;
+    const remainingRequests = totalAllowedRequests - user.numRequests;
+
+    const hasPaid = remainingRequests > 0;
+
     res.status(200).json({ hasPaid, remainingRequests });
   } catch (error) {
     console.error("Error checking payments:", error.message);
@@ -222,5 +228,6 @@ const checkHasPaid = async (req, res) => {
       .json({ message: "An error occurred while checking payment status" });
   }
 };
+
 
 export { signup, login, verifyEmail, checkUsername, getUser, checkHasPaid };
