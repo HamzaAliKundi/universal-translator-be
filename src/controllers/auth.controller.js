@@ -3,6 +3,7 @@ import sendVerificationEmail from "../services/emailService.js";
 import catchAsync from "../utils/catchAsync.js";
 import User from "../models/user.model.js";
 import { Payment } from "../models/PaymentSchema.js";
+import { createVerificationPage } from "../utils/htmlTemplates.js";
 
 const signup = catchAsync(async (req, res) => {
   const { email, password, username } = req.body;
@@ -101,19 +102,25 @@ const verifyEmail = catchAsync(async (req, res) => {
     // Find the user and verify their email
     const user = await User.findOne({ email: decoded.email });
     if (!user) {
-      return res.status(400).send(`
-          <h1>Invalid Token</h1>
-          <p>The link you used is invalid or has expired.</p>
-          <a href="${process.env.FRONT_END_URL}/resend-verification">Resend Verification Email</a>
-        `);
+      return res.status(400).send(
+        createVerificationPage(
+          'error',
+          'The link you used is invalid or has expired.',
+          'Resend Verification Email',
+          `${process.env.FRONT_END_URL}/`
+        )
+      );
     }
 
     if (user.isVerified) {
-      return res.status(200).send(`
-          <h1>Email Already Verified</h1>
-          <p>Your email has already been verified. Please proceed to log in.</p>
-          <a href="${process.env.FRONT_END_URL}">Go to Login</a>
-        `);
+      return res.status(200).send(
+        createVerificationPage(
+          'success',
+          'Your email has already been verified. Please proceed to log in.',
+          'Go to Login',
+          `${process.env.FRONT_END_URL}`
+        )
+      );
     }
 
     // Verify user and update token to prevent reuse
@@ -121,18 +128,23 @@ const verifyEmail = catchAsync(async (req, res) => {
     user.verificationToken = "null";
     await user.save();
 
-    // Respond with an HTML message
-    return res.status(200).send(`
-        <h1>Email Verified</h1>
-        <p>Thank you! Your email has been successfully verified.</p>
-        <a href="${process.env.FRONT_END_URL}/login">Click here to log in</a>
-      `);
+    return res.status(200).send(
+      createVerificationPage(
+        'success',
+        'Thank you! Your email has been successfully verified.',
+        'Click here to log in',
+        `${process.env.FRONT_END_URL}/`
+      )
+    );
   } catch (error) {
-    return res.status(400).send(`
-        <h1>Invalid or Expired Token</h1>
-        <p>It seems this verification link is no longer valid.</p>
-        <a href="${process.env.FRONT_END_URL}/resend-verification">Resend Verification Email</a>
-      `);
+    return res.status(400).send(
+      createVerificationPage(
+        'error',
+        'It seems this verification link is no longer valid.',
+        'Resend Verification Email',
+        `${process.env.FRONT_END_URL}/`
+      )
+    );
   }
 });
 
