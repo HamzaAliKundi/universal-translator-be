@@ -30,7 +30,25 @@ const sendVerificationEmail = async (email, token) => {
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background-color: #4A90E2; color: white; padding: 20px; text-align: center; }
             .content { padding: 20px; background-color: #f9f9f9; }
-            .button { background-color: #4CAF50; color: white; padding: 12px 25px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 20px 0; }
+            .button { 
+              background-color: #4A90E2; 
+              color: white !important; 
+              padding: 12px 25px; 
+              text-decoration: none; 
+              border-radius: 4px; 
+              display: inline-block; 
+              margin: 20px 0; 
+              cursor: pointer;
+              font-family: Arial, sans-serif;
+              font-size: 16px;
+              border: none;
+              text-align: center;
+            }
+            .verification-text {
+              color: #333333;
+              font-size: 14px;
+              margin-bottom: 10px;
+            }
             .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
           </style>
         </head>
@@ -47,16 +65,15 @@ const sendVerificationEmail = async (email, token) => {
                 <li>Translating content into multiple languages</li>
                 <li>Providing quick and accurate translations</li>
               </ul>
-              <p>To start using our services, please verify your email address by clicking the button below:</p>
+              <p class="verification-text">To start using our services, please verify your email address:</p>
               <center>
-                <a href="${process.env.BASE_URL}/api/auth/verify/${token}" class="button">Verify Email Address</a>
+                <a href="${process.env.BASE_URL}/api/auth/verify/${token}" class="button">Click here to verify your email</a>
               </center>
-              <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-              <p>${process.env.BASE_URL}/api/auth/verify/${token}</p>
-              <p>This link will expire in 24 hours for security reasons.</p>
+              <p>This verification link will expire in 24 hours.</p>
+              <p>If you did not create an account with Universal Translator, please disregard this email.</p>
             </div>
             <div class="footer">
-              <p>This email was sent by Universal Translator. If you didn't create this account, please ignore this email.</p>
+              <p>This is an automated message from Universal Translator.</p>
               <p>© ${new Date().getFullYear()} Universal Translator. All rights reserved.</p>
             </div>
           </div>
