@@ -6,6 +6,7 @@ import {
   signup,
   verifyEmail,
   checkHasPaid,
+  resendVerificationEmail
 } from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/protect.js";
 const router = Router();
@@ -15,5 +16,6 @@ router.get("/check-username", checkUsername); // Async controller function
 router.get("/verify/:token", verifyEmail); // Async controller function
 router.get("/get-user", getUser); // Async controller function
 router.get("/has-paid", protect, checkHasPaid); // Async controller function
+router.get("/resend-verification", resendVerificationEmail);
 
 export default router;

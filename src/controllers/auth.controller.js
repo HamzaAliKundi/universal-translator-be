@@ -241,5 +241,39 @@ const checkHasPaid = async (req, res) => {
   }
 };
 
+const resendVerificationEmail = catchAsync(async (req, res) => {
+  const { email } = req.query;
 
-export { signup, login, verifyEmail, checkUsername, getUser, checkHasPaid };
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+
+  // Find the user
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  if (user.isVerified) {
+    return res.status(400).json({ message: "Email is already verified" });
+  }
+
+  // Generate a new verification token
+  const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+
+  // Update the user's verification token
+  user.verificationToken = verificationToken;
+  await user.save();
+
+  // Send verification email
+  await sendVerificationEmail(email, verificationToken);
+
+  return res.status(200).json({
+    message: "Verification email has been resent. Please check your inbox.",
+  });
+});
+
+
+export { signup, login, verifyEmail, checkUsername, getUser, checkHasPaid, resendVerificationEmail };
